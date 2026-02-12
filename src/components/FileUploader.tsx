@@ -39,28 +39,43 @@ export default function FileUploader({ folderId, onUploadComplete }: FileUploade
     setUploading(true)
     setProgress(0)
 
-    try {
-      const formData = new FormData()
-      files.forEach((f) => formData.append('files', f))
-      if (folderId) formData.append('folderId', folderId)
-      formData.append('isPublic', String(isPublic))
+    const formData = new FormData()
+    files.forEach((f) => formData.append('files', f))
+    if (folderId) formData.append('folderId', folderId)
+    formData.append('isPublic', String(isPublic))
 
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      })
+    const xhr = new XMLHttpRequest()
 
-      if (!res.ok) throw new Error('Upload failed')
+    xhr.upload.addEventListener('progress', (e) => {
+      if (e.lengthComputable) {
+        setProgress(Math.round((e.loaded / e.total) * 100))
+      }
+    })
 
-      const data = await res.json()
-      toast.success(`${data.files.length} file(s) uploaded!`)
-      setFiles([])
-      onUploadComplete()
-    } catch (err) {
-      toast.error('Upload failed')
-    } finally {
+    xhr.addEventListener('load', () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          const data = JSON.parse(xhr.responseText)
+          toast.success(`${data.files.length} file(s) uploaded!`)
+        } catch {
+          toast.success('Upload complete!')
+        }
+        setFiles([])
+        setProgress(100)
+        onUploadComplete()
+      } else {
+        toast.error('Upload failed')
+      }
       setUploading(false)
-    }
+    })
+
+    xhr.addEventListener('error', () => {
+      toast.error('Upload failed')
+      setUploading(false)
+    })
+
+    xhr.open('POST', '/api/upload')
+    xhr.send(formData)
   }
 
   const formatSize = (bytes: number) => {
@@ -107,6 +122,24 @@ export default function FileUploader({ folderId, onUploadComplete }: FileUploade
               </button>
             </div>
           ))}
+
+          {uploading && (
+            <div className="pt-3">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-sm font-medium text-blue-600">Uploading...</span>
+                <span className="text-sm font-medium text-blue-600">{progress}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                <div
+                  className="bg-blue-600 h-3 rounded-full transition-all duration-300 ease-out"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+              <p className="text-xs text-gray-400 mt-1">
+                {formatSize(files.reduce((a, f) => a + f.size, 0) * progress / 100)} / {formatSize(files.reduce((a, f) => a + f.size, 0))}
+              </p>
+            </div>
+          )}
 
           <div className="flex items-center justify-between pt-3">
             <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
