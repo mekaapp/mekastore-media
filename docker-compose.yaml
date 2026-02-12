@@ -11,6 +11,7 @@ services:
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
       - NEXTAUTH_URL=${NEXTAUTH_URL:-https://media.mekastore.com}
       - UPLOAD_DIR=/app/uploads
+      - NEXT_BODY_MAX_SIZE=524288000
     depends_on:
       db:
         condition: service_healthy

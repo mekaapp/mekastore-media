@@ -40,5 +40,6 @@ USER nextjs
 EXPOSE 3000
 ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
+ENV NEXT_BODY_MAX_SIZE "524288000"
 
 CMD ["sh", "-c", "node ./node_modules/prisma/build/index.js db push && node server.js"]

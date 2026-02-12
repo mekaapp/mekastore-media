@@ -6,6 +6,9 @@ import { getUploadDir, generateStoredName } from '@/lib/storage'
 import { writeFile } from 'fs/promises'
 import { join } from 'path'
 
+export const maxDuration = 300
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions)
   if (!session?.user) {
