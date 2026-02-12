@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { Suspense, useEffect, useState, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
   Search, FolderPlus, ChevronRight, Home,
@@ -36,6 +36,14 @@ function formatSize(bytes: number) {
 }
 
 export default function FilesPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center h-40"><div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" /></div>}>
+      <FilesContent />
+    </Suspense>
+  )
+}
+
+function FilesContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const folderId = searchParams.get('folder')
