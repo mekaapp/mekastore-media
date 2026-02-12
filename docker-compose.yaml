@@ -4,8 +4,8 @@ services:
       context: .
     container_name: mekastore_media_app
     restart: always
-    ports:
-      - "${PORT:-3200}:3000"
+    expose:
+      - "3000"
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER:-media_user}:${POSTGRES_PASSWORD:-media_password}@db:5432/${POSTGRES_DB:-mekastore_media}
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
