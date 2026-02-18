@@ -17,8 +17,6 @@ services:
         condition: service_healthy
     volumes:
       - uploads:/app/uploads
-    networks:
-      - media_network
 
   db:
     image: postgres:15-alpine
@@ -30,17 +28,11 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-mekastore_media}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    networks:
-      - media_network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-media_user} -d ${POSTGRES_DB:-mekastore_media}"]
       interval: 5s
       timeout: 5s
       retries: 10
-
-networks:
-  media_network:
-    driver: bridge
 
 volumes:
   postgres_data:
